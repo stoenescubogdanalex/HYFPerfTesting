@@ -1,0 +1,11 @@
+# k6 results and reports
+results/
+*.json.gz
+
+# OS artefacts
+.DS_Store
+Thumbs.db
+
+# Editor directories
+.vscode/
+.idea/
