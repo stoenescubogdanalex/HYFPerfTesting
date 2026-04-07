@@ -16,12 +16,15 @@ A lightweight, structured [k6](https://k6.io/) framework for running performance
 ├── lib/                   # Shared utilities
 │   ├── checks.js          # Reusable k6 check helpers
 │   ├── helpers.js         # Request helpers and random data generators
+│   ├── reporter.js        # HTML report generation utilities
 │   └── thresholds.js      # Shared performance thresholds per test type
+├── results/               # Generated HTML reports (gitignored)
 └── tests/
     ├── smoke/
     │   └── smoke.test.js  # Smoke test  – 1 VU, 30 s
     ├── load/
-    │   └── load.test.js   # Load test   – ramp to 10 VUs over 5 min
+    │   ├── load.test.js   # Load test   – ramp to 10 VUs over 5 min
+    │   └── single-user.test.js # Single user baseline test
     └── stress/
         └── stress.test.js # Stress test – ramp to 100 VUs over ~16 min
 ```
@@ -99,6 +102,60 @@ Export results to a JSON file for further analysis or CI artefact storage:
 ```bash
 k6 run --out json=results/smoke.json tests/smoke/smoke.test.js
 ```
+
+---
+
+## HTML Reporting
+
+All tests automatically generate beautiful HTML reports that are saved to the `results/` folder. Each report includes:
+
+- **Summary statistics** – total requests, success rate, iterations, and average response time
+- **HTTP metrics** – detailed breakdowns of request duration, waiting time, connection time, etc.
+- **Thresholds** – pass/fail status for all defined performance thresholds
+- **Visual formatting** – color-coded metrics and responsive design
+
+### Report Location
+
+Reports are saved with timestamps in the filename:
+```
+results/
+├── smoke-test-2026-03-19T07-39-42.html
+├── load-test-2026-03-19T08-15-23.html
+└── single-user-test-2026-03-19T09-01-05.html
+```
+
+### Viewing Reports
+
+Simply open any HTML file in your browser:
+```bash
+open results/smoke-test-2026-03-19T07-39-42.html
+```
+
+### Custom Reporting
+
+The reporting module (`lib/reporter.js`) provides two functions:
+
+1. **`generateDetailedHtmlReport(data, options)`** – Full custom HTML report with styling
+   ```javascript
+   export function handleSummary(data) {
+     return generateDetailedHtmlReport(data, {
+       testName: 'my-test',
+       description: 'My Custom Test Description',
+       baseUrl: BASE_URL,
+     });
+   }
+   ```
+
+2. **`generateHtmlReport(data, testName)`** – Simple report using k6-reporter library
+   ```javascript
+   export function handleSummary(data) {
+     return generateHtmlReport(data, 'my-test');
+   }
+   ```
+
+### .gitignore
+
+The `results/` folder is already added to `.gitignore`, so your HTML reports won't be committed to version control.
 
 ---
 

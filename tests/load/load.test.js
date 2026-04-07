@@ -17,6 +17,7 @@ import {
 } from '../../lib/checks.js';
 import { getHeaders, randomPostId, randomUserId } from '../../lib/helpers.js';
 import { loadThresholds } from '../../lib/thresholds.js';
+import { generateDetailedHtmlReport } from '../../lib/reporter.js';
 
 const BASE_URL = __ENV.BASE_URL || 'https://jsonplaceholder.typicode.com';
 
@@ -65,4 +66,12 @@ export default function () {
   checkJsonBody(createRes);
 
   sleep(1);
+}
+
+export function handleSummary(data) {
+  return generateDetailedHtmlReport(data, {
+    testName: 'load-test',
+    description: 'Load Test - Normal Expected Traffic',
+    baseUrl: BASE_URL,
+  });
 }
